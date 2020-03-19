@@ -60,21 +60,21 @@ def logout():
 
 
 # http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST requests
-@app.route('/pythonlogin/register', methods=['GET', 'POST'])
+@app.route('/vestigia/register', methods=['GET', 'POST'])
 def register():
     # Output message if something goes wrong...
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+    if request.method == 'POST' and 'first_name' in request.form and 'last_name' in request.form and 'username' in request.form and 'password' in request.form and 'email' in request.form:
         # Create variables for easy access
-        firstname = request.form['First Name']
-        lastname = request.form['Last Name']
-        username = request.form['Username']
-        password = request.form['Password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        username = request.form['username']
+        password = request.form['password']
         email = request.form['email']
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE email = %s', [email])
+        cursor.execute('SELECT * FROM tb_user WHERE email = %s', [email])
         account = cursor.fetchone()
         # If account exists show error and validation checks
         if account:
@@ -83,15 +83,18 @@ def register():
             msg = 'Invalid email address!'
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'Username must contain only characters and numbers!'
-        elif not username or not password or not email:
+        elif not re.match(r'[A-Za-z]+', first_name):
+            msg = 'First name must contain only characters!'
+        elif not re.match(r'[A-Za-z]+', last_name):
+            msg = 'Last name must contain only characters!'
+        elif not first_name or not last_name or not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO tb_user VALUES (NULL, %s, %s, %s, %s, %s)', (firstname, lastname, username,
+            cursor.execute('INSERT INTO tb_user VALUES (NULL, %s, %s, %s, %s, %s)', (first_name, last_name, username,
                                                                                      password, email))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
-            return render_template('index.html', msg=msg)
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
