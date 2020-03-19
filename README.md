@@ -10,6 +10,6 @@
 
 5. Run command: flask run
 
-6. In your browser head to http://localhost:5000/vestigia/login
+6. In your browser head to http://localhost:5000/vestigia/
 
 In doing so, any changes you make will be reflected upon refreshing the browser, that way you don't have to constantly restart the web server
