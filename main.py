@@ -12,14 +12,14 @@ app.secret_key = 'key'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'pythonlogin'
+app.config['MYSQL_DB'] = 'vestigia'
 
 # Intialize MySQL
 mysql = MySQL(app)
 
 
 # http://localhost:5000/pythonlogin/ - this will be the login page, we need to use both GET and POST requests
-@app.route('/pythonlogin/', methods=['GET', 'POST'])
+@app.route('/vestigia/', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
     msg = ''
@@ -30,14 +30,14 @@ def login():
         password = request.form['password']
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password))
+        cursor.execute('SELECT * FROM tb_user WHERE username = %s AND password = %s', (username, password))
         # Fetch one record and return result
         account = cursor.fetchone()
         # If account exists in accounts table in out database
         if account:
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
-            session['id'] = account['id']
+            session['id'] = account['user_id']
             session['username'] = account['username']
             # Redirect to home page
             return redirect(url_for('home'))
@@ -49,7 +49,7 @@ def login():
 
 
 # http://localhost:5000/python/logout - this will be the logout page
-@app.route('/pythonlogin/logout')
+@app.route('/vestigia/logout')
 def logout():
     # Remove session data, this will log the user out
    session.pop('loggedin', None)
@@ -67,8 +67,10 @@ def register():
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
         # Create variables for easy access
-        username = request.form['username']
-        password = request.form['password']
+        firstname = request.form['First Name']
+        lastname = request.form['Last Name']
+        username = request.form['Username']
+        password = request.form['Password']
         email = request.form['email']
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -85,7 +87,8 @@ def register():
             msg = 'Please fill out the form!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
+            cursor.execute('INSERT INTO tb_user VALUES (NULL, %s, %s, %s, %s, %s)', (firstname, lastname, username,
+                                                                                     password, email))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
             return render_template('index.html', msg=msg)
@@ -97,7 +100,7 @@ def register():
 
 
 # http://localhost:5000/pythinlogin/home - this will be the home page, only accessible for loggedin users
-@app.route('/pythonlogin/home')
+@app.route('/vestigia/home')
 def home():
     # Check if user is loggedin
     if 'loggedin' in session:
@@ -108,13 +111,13 @@ def home():
 
 
 # http://localhost:5000/pythinlogin/profile - this will be the profile page, only accessible for loggedin users
-@app.route('/pythonlogin/profile')
+@app.route('/vestigia/profile')
 def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
         # We need all the account info for the user so we can display it on the profile page
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', [session['id']])
         account = cursor.fetchone()
         # Show the profile page with account info
         return render_template('profile.html', account=account)
