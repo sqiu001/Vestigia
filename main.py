@@ -1,8 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+import uuid
+
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
+import pusher
 
+pusher_client = pusher.Pusher(
+  app_id='966407',
+  key='ca7234b0ffae8ccd2559',
+  secret='c205f387f262e1fea3ee',
+  cluster='us2',
+  ssl=True
+)
+
+pusher_client.trigger('my-channel', 'my-event', {'message': 'hello world'})
 app = Flask(__name__)
 
 # Change this to your secret key (can be anything, it's for extra protection)

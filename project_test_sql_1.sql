@@ -7,6 +7,8 @@ CREATE TABLE user (
 	user_id INTEGER PRIMARY KEY AUTO_INCREMENT = 100,
 	first_name VARCHAR(50),
 	last_name VARCHAR(50),
+	username VARCHAR(50),
+	password VARCHAR(50),
 	email VARCHAR(100)
 );
 
