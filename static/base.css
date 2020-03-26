@@ -1,0 +1,23 @@
+
+.form-container {
+    width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    color: red;
+    font-size: 35px;
+}
+
+.page-title {
+    text-align: center;
+    line-height: 80px;
+}
+
+.main {
+      background: #fff
+      width: 730px;
+      margin:0 auto;
+      overflow: hidden;
+      padding: 10px;
+}
+
+

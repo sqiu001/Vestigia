@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block title %}Vestigia Home{% endblock %}
+{% block nav %}
+<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+{% endblock %}
+{% block content %}
+<h1>This is home page</h1>
+{% for foo in account %}
+
+{% endfor %}
+{% endblock %}
