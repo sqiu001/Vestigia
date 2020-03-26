@@ -35,10 +35,12 @@ def login_required(func):  # login required decorator
 @app.route("/")  # home page
 def home():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM tb_post')
+        cursor.execute('SELECT post_title, post_content, post_time FROM tb_post')
         # Fetch one record and return result
-        post = cursor.fetchone()
-      #  ses['title'] = account['post_title']
+        post = cursor.fetchall()
+        print("post", post)
+        if post:
+            return render_template('index.html', post=post)
         return render_template('index.html')
 
 
@@ -165,9 +167,9 @@ def post():
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM tb_post WHERE post_title = %s', (title,))
-        account = cursor.fetchone()
+        post = cursor.fetchone()
         # If account exists show error and validation checks
-        if account:
+        if post:
             msg = 'Error: Title already exists!\n'
         elif not title or not content:
             msg = 'Error: Please fill out the form!\n'
@@ -176,10 +178,11 @@ def post():
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id)"
                            " VALUES (%s, %s, %s)", (title, content, session['user_id']))
+            post = cursor.fetchall()
 
             mysql.connection.commit()
 
-            return render_template('index.html', msg=msg)
+            return render_template('index.html', post=post)
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'

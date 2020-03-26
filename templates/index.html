@@ -4,8 +4,19 @@
 <a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
 {% endblock %}
 {% block content %}
-<h1>This is home page</h1>
-{% for foo in account %}
 
+<h1>This is home page</h1>
+{% for foo in post %}
+   <ul style="list-style: none;">
+        <li>
+            <div class="post-group" style="width: 500px; margin: auto;">
+                <p>{{ foo['post_title'] }}</p>
+                <P>{{ foo['post_content'] }}</P>
+                <div>
+                    <span class="post-time">{{ foo['post_time'] }}</span>
+                </div>
+            </div>
+        </li>
+   </ul>
 {% endfor %}
 {% endblock %}
