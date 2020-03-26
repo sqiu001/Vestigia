@@ -4,17 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
-import pusher
 
-pusher_client = pusher.Pusher(
-  app_id='966407',
-  key='ca7234b0ffae8ccd2559',
-  secret='c205f387f262e1fea3ee',
-  cluster='us2',
-  ssl=True
-)
-
-pusher_client.trigger('my-channel', 'my-event', {'message': 'hello world'})
 app = Flask(__name__)
 
 # Change this to your secret key (can be anything, it's for extra protection)
@@ -64,11 +54,11 @@ def login():
 @app.route('/vestigia/logout')
 def logout():
     # Remove session data, this will log the user out
-   session.pop('loggedin', None)
-   session.pop('id', None)
-   session.pop('username', None)
-   # Redirect to login page
-   return redirect(url_for('login'))
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    # Redirect to login page
+    return redirect(url_for('login'))
 
 
 # http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST requests
@@ -115,12 +105,30 @@ def register():
 
 
 # http://localhost:5000/pythinlogin/home - this will be the home page, only accessible for loggedin users
-@app.route('/vestigia/home')
+@app.route('/vestigia/home', methods=['GET', 'POST'])
 def home():
     # Check if user is loggedin
+    msg = ''
     if 'loggedin' in session:
+        if request.method == 'POST' and 'job_company_name' in request.form and 'job_position' in request.form and \
+                'job_location' in request.form and 'job_status' in request.form and 'job_link' in request.form:
+            company = request.form['job_company_name']
+            position = request.form['job_position']
+            location = request.form['job_location']
+            status = request.form['job_status']
+            link = request.form['job_link']
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            account = cursor.fetchone()
+            if account:
+                cursor.execute('INSERT INTO tb_job VALUES (NULL, %d, %s, %s, %s, %s, %s)', (session['id'], company,
+                                                                                            position, location, status,
+                                                                                            link))
+            mysql.connection.commit()
+            msg = 'You have successfully posted!'
+            return render_template('home.html', username=session['username'], msg=msg)
         # User is loggedin show them the home page
         return render_template('home.html', username=session['username'])
+
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 

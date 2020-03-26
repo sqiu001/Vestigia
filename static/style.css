@@ -141,7 +141,8 @@ body.loggedin {
   	margin: 25px 0;
   	padding: 25px;
 	background-color: #fff;*/
-}
+/*}*/
+
 .content > p table td, .content > div table td {
 	padding: 5px;
 }
@@ -153,6 +154,127 @@ body.loggedin {
 .content > div p {
 	padding: 5px;
 	margin: 0 0 10px 0;
+}
+
+/* Fix the button on the left side of the page */
+.open-btn {
+      display: flex;
+      justify-content: left;
+}
+/* Style and fix the button on the page */
+.post {
+  color: blue;
+  box-shadow:inset 0px 1px 0px 0px #efdcfb;
+  background: #dfbdfa linear-gradient(to bottom, #dfbdfa 5%, #bc80ea 100%);
+  border-radius:6px;
+  border:1px solid #c584f3;
+  display:inline-block;
+  cursor:pointer;
+  color:#ffffff;
+  font-family:Arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:6px 24px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #9752cc;
+}
+
+.post:hover {
+	background: #bc80ea linear-gradient(to bottom, #bc80ea 5%, #dfbdfa 100%);
+}
+
+#postPopup {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Hide the Popup form */
+.form-popup {
+      border: 2px solid #666;
+      z-index: 9;
+      max-width: 300px;
+      margin: 0 auto;
+}
+/* Styles for the form container */
+.form-container {
+      max-width: 300px;
+      padding: 20px;
+      background-color: #fff;
+}
+/* Full-width for input fields */
+.form-container input[type=text], input[type=url]{
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 22px 0;
+      border: none;
+      background: #eee;
+      }
+/* When the inputs get focus, do something */
+.form-container input[type=text]:focus, input[type=url]:focus{
+   background-color: #ddd;
+   outline: none;
+}
+/* Style submit/post button */
+.form-container .btn {
+      /*background-color: #8ebf42;*/
+      /*color: #fff;*/
+      /*padding: 12px 20px;*/
+      /*border: none;*/
+      /*cursor: pointer;*/
+      /*width: 100%;*/
+      /*margin-bottom:10px;*/
+      /*opacity: 0.8;*/
+
+    box-shadow:inset 0px 0px 14px -3px #f9ffe8;
+	background: #c4eb70 linear-gradient(to bottom, #c4eb70 5%, #72b344 100%);
+	border-radius:6px;
+	border:1px solid #b2b8ad;
+	/*display:inline-block;*/
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	width:40%;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #ced9bf;
+    margin-left: 15px;
+}
+/* Style cancel button */
+.form-container .cancel {
+      /*background-color: #cc0000;*/
+	  box-shadow:inset 0px 0px 14px -3px #f7c5c0;
+	  background: #fc8d83 linear-gradient(to bottom, #fc8d83 5%, #e4685d 100%);
+	  border-radius:6px;
+	  border:1px solid #d83526;
+	  /*display:inline-block;*/
+	  cursor:pointer;
+	  color:#ffffff;
+	  font-family:Arial;
+	  font-size:15px;
+	  font-weight:bold;
+	  padding:6px 24px;
+	  width: 40%;
+	  text-decoration:none;
+	  text-shadow:0px 1px 0px #b23e35;
+}
+/* Hover effects for post button */
+.form-container .btn:hover {
+	background: #72b344 linear-gradient(to bottom, #72b344 5%, #c4eb70 100%);
+}
+
+.form-container .cancel:hover {
+	background: #e4685d linear-gradient(to bottom, #e4685d 5%, #fc8d83 100%);
 }
 
 

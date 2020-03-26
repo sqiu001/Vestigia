@@ -3,8 +3,67 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h2>Home</h2>
-<p>Welcome back, {{ username }}!</p>
+<html>
+  <body>
+    <h2>Home</h2>
+<!--    <p>Welcome back, {{ username }}!</p>-->
+    <p>Click on the Post button to post.</p>
+    <div class="open-btn">
+      <button class="post" onclick="openForm()">
+      <strong>Post</strong>
+      </button>
+    </div>
+    <div id="postPopup">
+      <div class="form-popup" id="popupForm">
+        <form action="{{ url_for('home') }}" method="post" class="form-container">
+          <h2>Please Fill in Form</h2>
+          <label for="company">
+          <strong>Company</strong>
+          </label>
+          <input type="text" id="company" placeholder="Company Name" name="company" required>
 
+          <label for="position">
+          <strong>Position</strong>
+          </label>
+          <input type="text" id="position" placeholder="Job Position" name="position" required>
 
+          <label for="location">
+          <strong>Location</strong>
+          </label>
+          <input type="text" id="location" placeholder="Job Location" name="location" required>
+
+          <label for="status">
+          <strong>Status</strong>
+          </label>
+          <input type="text" id="status" placeholder="Job Status" name="status" required>
+
+          <label for="link">
+          <strong>Link</strong>
+          </label>
+          <input type="url" id="link" placeholder="Job Link" name="link" required>
+
+          <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
+          <button type="submit" class="btn">Post</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      function openForm() {
+        document.getElementById("postPopup").style.display="block";
+      }
+
+      function closeForm() {
+        document.getElementById("postPopup").style.display= "none";
+      }
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        var modal = document.getElementById('postPopup');
+        if (event.target == modal) {
+          closeForm();
+        }
+      }
+
+    </script>
+  </body>
+</html>
 {% endblock %}
