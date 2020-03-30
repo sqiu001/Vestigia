@@ -34,17 +34,42 @@ def login_required(func):  # login required decorator
 # http://localhost:5000/pythinlogin/home - this will be the home page, only accessible for loggedin users
 @app.route("/")  # home page
 def home():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT post_title, post_content, post_time, user_name, post_id, user_id'
+                   ' FROM tb_post order by -post_time')
+    # Fetch all records and return result
+    post = cursor.fetchall()
+    if post:
+        return render_template('index.html', post=post)
+    return render_template('index.html')
+
+
+#  link the post_content to the reply page
+@app.route('/reply/<post_id>/')
+@login_required
+def into_reply(post_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tb_post WHERE post_id = %s', (post_id,))
+    posted = cursor.fetchone()
+    cursor.execute('SELECT reply_content, reply_time, user_name, user_id, post_id'
+                   ' FROM tb_reply WHERE post_id = %s order by -reply_time', (post_id,))
+    reply = cursor.fetchall()
+    session['post_id'] = posted['post_id']
+    return render_template('reply.html', posted=posted, reply=reply)
+
+
+# reply feature
+@app.route('/add_reply/', methods=['post'])
+def add_reply():
+    reply_content = request.form['reply_content']
+    if not reply_content:
+        return redirect(url_for('into_reply', post_id=session['post_id']))
+    else:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT post_title, post_content, post_time, user_name FROM tb_post order by'
-                       ' -post_time')
-        # Fetch all records and return result
-        post = cursor.fetchall()
-        print('post', post)
-        if post:
-            return render_template('index.html', post=post)
-        return render_template('index.html')
-
-
+        cursor.execute('INSERT INTO tb_reply (user_name, user_id, reply_content, post_id) VALUES '
+                       '(%s, %s, %s, %s)', (session['username'], session['user_id'], reply_content, session['post_id']))
+        mysql.connection.commit()
+        return redirect(url_for('into_reply', post_id=session['post_id']))
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -116,9 +141,11 @@ def register():
     return render_template('register.html', msg=msg)
 
 
+# display current user on navigation bar
 @app.context_processor
 def my_context_processor():
     user_id = session.get('user_id')
+    print('user_id', user_id)
     if user_id:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (user_id,))
@@ -130,7 +157,7 @@ def my_context_processor():
 
 
 # http://localhost:5000/pythinlogin/profile - this will be the profile page, only accessible for loggedin users
-@app.route('/profile/')
+@app.route('/profile/myProfile')
 def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
@@ -144,6 +171,17 @@ def profile():
     return redirect(url_for('login'))
 
 
+# this will be the poster_file page
+@app.route('/poster_profile/<poster_id>')
+@login_required
+def poster_profile(poster_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (poster_id,))
+    account = cursor.fetchone()
+    return render_template('profile.html', poster_account=account)
+
+
+
 # http://localhost:5000/python/logout - this will be the logout page
 @app.route('/logout/')
 def logout():
@@ -151,12 +189,11 @@ def logout():
     # session.pop('loggedin', None)
     session.pop('user_id', None)
     # session.pop('username', None)
-
     # Redirect to login page
     return redirect(url_for('login'))
 
 
-@app.route('/profile/post', methods=['GET', 'POST'])
+@app.route('/post/', methods=['GET', 'POST'])
 @login_required
 def post():
     msg = ''
@@ -179,11 +216,9 @@ def post():
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id, user_name)"
                            " VALUES (%s, %s, %s, %s)", (title, content, session['user_id'], session['username']))
-            post = cursor.fetchall()
-
             mysql.connection.commit()
+            return redirect(url_for('home'))
 
-            return render_template('index.html', post=post)
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
