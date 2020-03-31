@@ -1,3 +1,10 @@
+create table followers (
+        follower_id INT not null,
+        followed_id INT not null,
+        foreign key (follower_id) references (user_id),
+        foreign key (followed_id) references (user_id)
+);
+
 # The users that we are following.
 def following(self):
     return (
