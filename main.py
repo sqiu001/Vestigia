@@ -1,4 +1,5 @@
 import uuid
+from functools import wraps
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
@@ -18,6 +19,18 @@ app.config['MYSQL_DB'] = 'vestigia'
 
 # Intialize MySQL
 mysql = MySQL(app)
+
+
+def login_required(func):  # login required decorator
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if session.get('user_id'):
+            return func(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+
+    return wrapper
 
 
 # http://localhost:5000/pythonlogin/ - this will be the login page, we need to use both GET and POST requests
@@ -47,7 +60,7 @@ def login():
             # Account doesnt exist or username/password incorrect
             msg = 'Incorrect username/password!'
     # Show the login form with message (if any)
-    return render_template('index.html', msg=msg)
+    return render_template('login.html', msg=msg)
 
 
 # http://localhost:5000/python/logout - this will be the logout page
@@ -107,30 +120,38 @@ def register():
 # http://localhost:5000/pythinlogin/home - this will be the home page, only accessible for loggedin users
 @app.route('/vestigia/home', methods=['GET', 'POST'])
 def home():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT post_title, post_content, post_time, user_name FROM tb_post order by'
+                   ' -post_time')
+    # Fetch all records and return result
+    post = cursor.fetchall()
+    print('post', post)
+    if post:
+        return render_template('home.html', post=post)
+    return render_template('home.html')
     # Check if user is loggedin
-    msg = ''
-    if 'loggedin' in session:
-        if request.method == 'POST' and 'job_company_name' in request.form and 'job_position' in request.form and \
-                'job_location' in request.form and 'job_status' in request.form and 'job_link' in request.form:
-            company = request.form['job_company_name']
-            position = request.form['job_position']
-            location = request.form['job_location']
-            status = request.form['job_status']
-            link = request.form['job_link']
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            account = cursor.fetchone()
-            if account:
-                cursor.execute('INSERT INTO tb_job VALUES (NULL, %d, %s, %s, %s, %s, %s)', (session['id'], company,
-                                                                                            position, location, status,
-                                                                                            link))
-            mysql.connection.commit()
-            msg = 'You have successfully posted!'
-            return render_template('home.html', username=session['username'], msg=msg)
-        # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
-
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
+    # msg = ''
+    # if 'loggedin' in session:
+    #     if request.method == 'POST' and 'job_company_name' in request.form and 'job_position' in request.form and \
+    #             'job_location' in request.form and 'job_status' in request.form and 'job_link' in request.form:
+    #         company = request.form['job_company_name']
+    #         position = request.form['job_position']
+    #         location = request.form['job_location']
+    #         status = request.form['job_status']
+    #         link = request.form['job_link']
+    #         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    #         account = cursor.fetchone()
+    #         if account:
+    #             cursor.execute('INSERT INTO tb_job VALUES (NULL, %s, %s, %s, %s, %s, %s)', (session['id'], company,
+    #                                                                                         position, location, status,
+    #                                                                                         link))
+    #             mysql.connection.commit()
+    #             msg = 'You have successfully posted!'
+    #             return render_template('home.html', username=session['username'], msg=msg)
+    #     # User is loggedin show them the home page
+    #     return render_template('home.html', username=session['username'])
+    # # User is not loggedin redirect to login page
+    # return redirect(url_for('login'))
 
 
 # http://localhost:5000/pythinlogin/profile - this will be the profile page, only accessible for loggedin users
@@ -146,3 +167,49 @@ def profile():
         return render_template('profile.html', account=account)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
+
+
+def login_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if session.get('user_id'):
+            return func(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+
+    return wrapper
+
+
+@app.route('/profile/post', methods=['GET', 'POST'])
+@login_required
+def post():
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'title' in request.form and 'content' in request.form:
+        # Create variables for easy access
+        title = request.form['title']  # get data from url form
+        content = request.form['content']
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM tb_post WHERE post_title = %s', (title,))
+        post = cursor.fetchone()
+        # If account exists show error and validation checks
+        if post:
+            msg = 'Error: Title already exists!\n'
+        elif not title or not content:
+            msg = 'Error: Please fill out the form!\n'
+        else:
+            msg = 'You have successfully posted!'
+            # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id, user_name)"
+                           " VALUES (%s, %s, %s, %s)", (title, content, session['user_id'], session['username']))
+            post = cursor.fetchall()
+
+            mysql.connection.commit()
+
+            return render_template('index.html', post=post)
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+        # Show registration form with message (if any)
+    return render_template('post.html', msg=msg)

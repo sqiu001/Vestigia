@@ -1,8 +1,27 @@
 {% extends 'layout.html' %}
 
 {% block title %}Home{% endblock %}
-
+{% block nav %}
+<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+{% endblock %}
 {% block content %}
+
+<h1>This is home page</h1>
+{% for foo in post %}
+   <ul style="list-style: none;">
+        <li>
+            <div class="post-group" style="width: 500px; margin: auto;">
+                <p><a href="">{{ foo['post_title'] }}</a></p>
+                <P>{{ foo['post_content'] }}</P>
+                <div style="margin: auto;">
+                    <span class="post-time" style="margin:0 60px;"><a href=""> Author: {{ foo['user_name'] }}</a></span>
+                    <span class="post-time"> Posted Time: {{ foo['post_time'] }}</span>
+                </div>
+            </div>
+        </li>
+   </ul>
+{% endfor %}
+
 <html>
   <body>
     <h2>Home</h2>
@@ -13,57 +32,57 @@
       <strong>Post</strong>
       </button>
     </div>
-    <div id="postPopup">
-      <div class="form-popup" id="popupForm">
-        <form action="{{ url_for('home') }}" method="post" class="form-container">
-          <h2>Please Fill in Form</h2>
-          <label for="company">
-          <strong>Company</strong>
-          </label>
-          <input type="text" id="company" placeholder="Company Name" name="company" required>
+<!--    <div id="postPopup">-->
+<!--      <div class="form-popup" id="popupForm">-->
+<!--        <form action="{{ url_for('home') }}" method="post" class="form-container">-->
+<!--          <h2>Please Fill in Form</h2>-->
+<!--          <label for="company">-->
+<!--          <strong>Company</strong>-->
+<!--          </label>-->
+<!--          <input type="text" id="job_company_name" placeholder="Company Name" name="company" required>-->
 
-          <label for="position">
-          <strong>Position</strong>
-          </label>
-          <input type="text" id="position" placeholder="Job Position" name="position" required>
+<!--          <label for="position">-->
+<!--          <strong>Position</strong>-->
+<!--          </label>-->
+<!--          <input type="text" id="job_position" placeholder="Job Position" name="position" required>-->
 
-          <label for="location">
-          <strong>Location</strong>
-          </label>
-          <input type="text" id="location" placeholder="Job Location" name="location" required>
+<!--          <label for="location">-->
+<!--          <strong>Location</strong>-->
+<!--          </label>-->
+<!--          <input type="text" id="job_location" placeholder="Job Location" name="location" required>-->
 
-          <label for="status">
-          <strong>Status</strong>
-          </label>
-          <input type="text" id="status" placeholder="Job Status" name="status" required>
+<!--          <label for="status">-->
+<!--          <strong>Status</strong>-->
+<!--          </label>-->
+<!--          <input type="text" id="job_status" placeholder="Job Status" name="status" required>-->
 
-          <label for="link">
-          <strong>Link</strong>
-          </label>
-          <input type="url" id="link" placeholder="Job Link" name="link" required>
+<!--          <label for="link">-->
+<!--          <strong>Link</strong>-->
+<!--          </label>-->
+<!--          <input type="url" id="job_link" placeholder="Job Link" name="link" required>-->
 
-          <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
-          <button type="submit" class="btn">Post</button>
-        </form>
-      </div>
-    </div>
-    <script>
-      function openForm() {
-        document.getElementById("postPopup").style.display="block";
-      }
+<!--          <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>-->
+<!--          <button type="submit" class="btn">Post</button>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <script>-->
+<!--      function openForm() {-->
+<!--        document.getElementById("postPopup").style.display="block";-->
+<!--      }-->
 
-      function closeForm() {
-        document.getElementById("postPopup").style.display= "none";
-      }
-      // When the user clicks anywhere outside of the modal, close it
-      window.onclick = function(event) {
-        var modal = document.getElementById('postPopup');
-        if (event.target == modal) {
-          closeForm();
-        }
-      }
+<!--      function closeForm() {-->
+<!--        document.getElementById("postPopup").style.display= "none";-->
+<!--      }-->
+<!--      // When the user clicks anywhere outside of the modal, close it-->
+<!--      window.onclick = function(event) {-->
+<!--        var modal = document.getElementById('postPopup');-->
+<!--        if (event.target == modal) {-->
+<!--          closeForm();-->
+<!--        }-->
+<!--      }-->
 
-    </script>
+<!--    </script>-->
   </body>
 </html>
 {% endblock %}
