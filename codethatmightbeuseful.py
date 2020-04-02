@@ -5,6 +5,19 @@ create table followers (
         foreign key (followed_id) references (user_id)
 );
 
+CREATE TABLE tb_user ( 
+        user_id INT PRIMARY KEY AUTO_INCREMENT,
+        user_name varchar(50),
+        user_password varchar(50),
+	-- first_name VARCHAR(50),
+	-- last_name VARCHAR(50),
+	email VARCHAR(100),
+        follower_id INT not null,
+        followed_id INT not null,
+        foreign key (follower_id) references (user_id),
+        foreign key (followed_id) references (user_id)
+);
+
 # The users that we are following.
 def following(self):
     return (
