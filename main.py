@@ -239,9 +239,8 @@ def search():
         account = cursor.fetchone()
         if account:
             return render_template('profile.html', poster_account=account)
-        else:
-            msg = 'User does not exist'
-            return render_template('index.html', msg=msg)
+    flash('User does not exist')
+    return render_template('profile.html')
 
 
 # @app.route('/users/', methods=['GET', 'POST'])
