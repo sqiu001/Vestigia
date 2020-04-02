@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
@@ -224,6 +224,21 @@ def post():
         msg = 'Please fill out the form!'
         # Show registration form with message (if any)
     return render_template('post.html', msg=msg)
+
+
+@app.route('/search/', methods=['GET', 'POST'])
+@login_required
+def search():
+    if request.method == "POST" and 'username' in request.form:
+        username = request.form['username']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # search by username
+        cursor.execute('SELECT * FROM tb_user WHERE user_name = %s', (username,))
+        account = cursor.fetchone()
+        if account:
+            return render_template('profile.html', poster_account=account)
+    flash('User does not exist')
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
