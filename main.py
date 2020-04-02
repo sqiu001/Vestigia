@@ -240,7 +240,7 @@ def search():
         if account:
             return render_template('profile.html', poster_account=account)
     flash('User does not exist')
-    return render_template('profile.html')
+    return redirect(url_for('home'))
 
 
 # @app.route('/users/', methods=['GET', 'POST'])
