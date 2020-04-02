@@ -4,19 +4,36 @@
 		<meta charset="utf-8">
 		<title>{% block title %}{% endblock %}</title>
 		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+			  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+			  crossorigin="anonymous">
+		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+				integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+				crossorigin="anonymous"></script>
 	</head>
-	<body class="loggedin">
+	<body class>
 		<nav class="navtop">
 			<div>
 				<h1>Vestigia</h1>
-                <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
-				<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
-				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
+				{% if account %}
+    					<form action="{{ url_for('search') }}" method="post" class="search">
+      							<input type="text" placeholder="Search.." name="username">
+								<button type="submit"><i class="fa fa-search"></i></button>
+    					</form>
+					<a href="/"><i class="fas fa-home"></i>Home</a>
+					<a href="{{ url_for('profile') }}">User: {{ account.username }}</a>
+					{% block nav %}{% endblock %}
+					<a href="{{ url_for('logout') }}"><i class="fas fa-sign"></i>Logout</a>
+				{% else %}
+                	<a href="/"><i class="fas fa-home"></i>Home</a>
+					<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+					<a href="{{ url_for('login') }}"><i class="fas fa-sign"></i>Login/Register</a>
+				{% endif %}
 			</div>
 		</nav>
-		<div class="content">
-			{% block content %}{% endblock %}
-		</div>
+		{% block content %}{% endblock %}
 	</body>
 </html>

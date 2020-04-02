@@ -1,38 +1,37 @@
 {% extends 'layout.html' %}
-
-{% block title %}Profile{% endblock %}
+{% block title %}Vestigia Home{% endblock %}
+    {% block nav %}
+    <a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+    {% endblock %}
 
 {% block content %}
-<h2>{{ account['username'] }}</h2>
-<!--    <table>-->
-<!--        <tr valign="top">-->
-<!--            <td><h1>{{ account.username }}</h1></td>-->
-<!--        </tr>-->
-<!--    </table>-->
-
-<div>
-    <p>Your account details are below:</p>
-    <table>
-        <tr>
-            <td>First Name:</td>
-            <td>{{ account['first_name'] }}</td>
-        </tr>
-        <tr>
-            <td>Last Name:</td>
-            <td>{{ account['last_name'] }}</td>
-        </tr>
-        <tr>
-            <td>Username:</td>
-            <td>{{ account['username'] }}</td>
-        </tr>
-        <tr>
-            <td>Password:</td>
-            <td>{{ account['password'] }}</td>
-        </tr>
-        <tr>
-            <td>Email:</td>
-            <td>{{ account['email'] }}</td>
-        </tr>
-    </table>
-</div>
+    {% if poster_account %}
+    <div class="content">
+        <h2>User Profile</h2>
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td>{{ poster_account.username }}</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td>{{ poster_account.email }}</td>
+            </tr>
+        </table>
+    </div>
+    {% else %}
+    <div class="content">
+        <h2>User Profile</h2>
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td>{{ account.username }}</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td>{{ account.email }}</td>
+            </tr>
+        </table>
+    </div>
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block title %}Vestigia Home{% endblock %}
+{% block nav %}
+<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+{% endblock %}
+
+{% block content %}
+
+<h2>This is home page</h2>
+<div class="main">
+{% for ps in post %}
+   <ul>
+        <li>
+            <div class="post-group">
+                <p class="post-title"><a href="{{ url_for('into_reply', post_id=ps.post_id) }}">
+                    {{ ps.post_title }}</a></p>
+                <P class="post-content">{{ ps.post_content }}</P>
+                <div class="post-info">
+                    <span class="post-author"><a href="{{ url_for('poster_profile', poster_id=ps.user_id) }}">
+                        {{ ps.username }}</a></span>
+                    <span class="post-time">{{ ps.post_time }}</span>
+                </div>
+            </div>
+        </li>
+   </ul>
+{% endfor %}
+</div>
+{% endblock %}

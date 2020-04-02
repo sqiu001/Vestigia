@@ -1,10 +1,8 @@
-import uuid
-from functools import wraps
-
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -33,8 +31,48 @@ def login_required(func):  # login required decorator
     return wrapper
 
 
-# http://localhost:5000/pythonlogin/ - this will be the login page, we need to use both GET and POST requests
-@app.route('/vestigia/', methods=['GET', 'POST'])
+# http://localhost:5000/pythinlogin/home - this will be the home page, only accessible for loggedin users
+@app.route("/")  # home page
+def home():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT post_title, post_content, post_time, username, post_id, user_id'
+                   ' FROM tb_post order by -post_time')
+    # Fetch all records and return result
+    post = cursor.fetchall()
+    if post:
+        return render_template('index.html', post=post)
+    return render_template('index.html')
+
+
+#  link the post_content to the reply page
+@app.route('/reply/<post_id>/')
+@login_required
+def into_reply(post_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tb_post WHERE post_id = %s', (post_id,))
+    posted = cursor.fetchone()
+    cursor.execute('SELECT reply_content, reply_time, username, user_id, post_id'
+                   ' FROM tb_reply WHERE post_id = %s order by -reply_time', (post_id,))
+    reply = cursor.fetchall()
+    session['post_id'] = posted['post_id']
+    return render_template('reply.html', posted=posted, reply=reply)
+
+
+# reply feature
+@app.route('/add_reply/', methods=['post'])
+def add_reply():
+    reply_content = request.form['reply_content']
+    if not reply_content:
+        return redirect(url_for('into_reply', post_id=session['post_id']))
+    else:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('INSERT INTO tb_reply (username, user_id, reply_content, post_id) VALUES '
+                       '(%s, %s, %s, %s)', (session['username'], session['user_id'], reply_content, session['post_id']))
+        mysql.connection.commit()
+        return redirect(url_for('into_reply', post_id=session['post_id']))
+
+
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
     msg = ''
@@ -52,10 +90,11 @@ def login():
         if account:
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
-            session['id'] = account['user_id']
+            session['user_id'] = account['user_id']
             session['username'] = account['username']
+            # session['password'] = account['user_password']
             # Redirect to home page
-            return redirect(url_for('home'))
+            return redirect(url_for('profile'))
         else:
             # Account doesnt exist or username/password incorrect
             msg = 'Incorrect username/password!'
@@ -63,19 +102,8 @@ def login():
     return render_template('login.html', msg=msg)
 
 
-# http://localhost:5000/python/logout - this will be the logout page
-@app.route('/vestigia/logout')
-def logout():
-    # Remove session data, this will log the user out
-    session.pop('loggedin', None)
-    session.pop('id', None)
-    session.pop('username', None)
-    # Redirect to login page
-    return redirect(url_for('login'))
-
-
 # http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST requests
-@app.route('/vestigia/register', methods=['GET', 'POST'])
+@app.route('/register/', methods=['GET', 'POST'])
 def register():
     # Output message if something goes wrong...
     msg = ''
@@ -117,51 +145,27 @@ def register():
     return render_template('register.html', msg=msg)
 
 
-# http://localhost:5000/pythinlogin/home - this will be the home page, only accessible for loggedin users
-@app.route('/vestigia/home', methods=['GET', 'POST'])
-def home():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT post_title, post_content, post_time, user_name FROM tb_post order by'
-                   ' -post_time')
-    # Fetch all records and return result
-    post = cursor.fetchall()
-    print('post', post)
-    if post:
-        return render_template('home.html', post=post)
-    return render_template('home.html')
-    # Check if user is loggedin
-    # msg = ''
-    # if 'loggedin' in session:
-    #     if request.method == 'POST' and 'job_company_name' in request.form and 'job_position' in request.form and \
-    #             'job_location' in request.form and 'job_status' in request.form and 'job_link' in request.form:
-    #         company = request.form['job_company_name']
-    #         position = request.form['job_position']
-    #         location = request.form['job_location']
-    #         status = request.form['job_status']
-    #         link = request.form['job_link']
-    #         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    #         account = cursor.fetchone()
-    #         if account:
-    #             cursor.execute('INSERT INTO tb_job VALUES (NULL, %s, %s, %s, %s, %s, %s)', (session['id'], company,
-    #                                                                                         position, location, status,
-    #                                                                                         link))
-    #             mysql.connection.commit()
-    #             msg = 'You have successfully posted!'
-    #             return render_template('home.html', username=session['username'], msg=msg)
-    #     # User is loggedin show them the home page
-    #     return render_template('home.html', username=session['username'])
-    # # User is not loggedin redirect to login page
-    # return redirect(url_for('login'))
+@app.context_processor
+def my_context_processor():
+    user_id = session.get('user_id')
+    if user_id:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (user_id,))
+        # Fetch one record and return result
+        account = cursor.fetchone()
+        if account:
+            return {'account': account}
+    return {}
 
 
 # http://localhost:5000/pythinlogin/profile - this will be the profile page, only accessible for loggedin users
-@app.route('/vestigia/profile')
+@app.route('/profile/')
 def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
         # We need all the account info for the user so we can display it on the profile page
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', [session['id']])
+        cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', [session['user_id']])
         account = cursor.fetchone()
         # Show the profile page with account info
         return render_template('profile.html', account=account)
@@ -169,15 +173,26 @@ def profile():
     return redirect(url_for('login'))
 
 
-def login_required(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if session.get('user_id'):
-            return func(*args, **kwargs)
-        else:
-            return redirect(url_for('login'))
+# this will be the poster_file page
+@app.route('/poster_profile/<poster_id>')
+@login_required
+def poster_profile(poster_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (poster_id,))
+    account = cursor.fetchone()
+    return render_template('profile.html', poster_account=account)
 
-    return wrapper
+
+# http://localhost:5000/python/logout - this will be the logout page
+@app.route('/logout/')
+def logout():
+    # Remove session data, this will log the user out
+    # session.pop('loggedin', None)
+    session.pop('user_id', None)
+    # session.pop('username', None)
+
+    # Redirect to login page
+    return redirect(url_for('login'))
 
 
 @app.route('/profile/post', methods=['GET', 'POST'])
@@ -195,21 +210,50 @@ def post():
         post = cursor.fetchone()
         # If account exists show error and validation checks
         if post:
+            session['post_id'] = post['post_id']
             msg = 'Error: Title already exists!\n'
         elif not title or not content:
             msg = 'Error: Please fill out the form!\n'
         else:
             msg = 'You have successfully posted!'
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id, user_name)"
+            cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id, username)"
                            " VALUES (%s, %s, %s, %s)", (title, content, session['user_id'], session['username']))
-            post = cursor.fetchall()
-
             mysql.connection.commit()
-
-            return render_template('index.html', post=post)
+            return redirect(url_for('home'))
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
         # Show registration form with message (if any)
     return render_template('post.html', msg=msg)
+
+
+@app.route('/search/', methods=['GET', 'POST'])
+@login_required
+def search():
+    if request.method == "POST" and 'username' in request.form:
+        username = request.form['username']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # search by username
+        cursor.execute('SELECT * FROM tb_user WHERE username=%s', (username,))
+        account = cursor.fetchone()
+        if account:
+            return render_template('profile.html', poster_account=account)
+        else:
+            msg = 'User does not exist'
+            return render_template('index.html', msg=msg)
+
+
+# @app.route('/users/', methods=['GET', 'POST'])
+# @login_required
+# def users():
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute('SELECT first_name, last_name, username, email, user_id'
+#                    ' FROM tb_user')
+#     user = cursor.fetchall()
+#     if user:
+#         return render_template('user_profile.html', user=user)
+#     return render_template('user_profile.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -1,10 +1,5 @@
-
 {% extends 'layout.html' %}
 {% block title %}Vestigia Home{% endblock %}
-{% block nav %}
-
-{% endblock %}
-
 {% block content %}
 			<h2 class="page-title">Post</h2>
             <form action="{{ url_for('post') }}" method="post" autocomplete="off">
@@ -23,3 +18,4 @@
                 </div>
             </form>
 {% endblock %}
+
