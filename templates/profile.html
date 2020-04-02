@@ -18,7 +18,8 @@
                 <td>{{ poster_account.email }}</td>
             </tr>
         </table>
-    {% else %}
+
+    {% elif not poster_account %}
         <div class="container" style="min-height:100% width:80%">
 	        {% with messages = get_flashed_messages() %}
 	            {% if messages %}
@@ -30,7 +31,6 @@
 		            {% endfor %}
 	            {% endif %}
 	        {% endwith %}
-            {% block body %}{% endblock %}
 	    </div>
 
 	    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -40,6 +40,21 @@
         </script>
         </div>
 
+         <div class="content">
+        <h2>User Profile</h2>
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    {% else %}
     <div class="content">
         <h2>User Profile</h2>
         <table>
