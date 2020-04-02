@@ -19,7 +19,7 @@
             </tr>
         </table>
 
-    {% elif not poster_account %}
+    {% elif not poster_account , not account%}
         <div class="container" style="min-height:100% width:80%">
 	        {% with messages = get_flashed_messages() %}
 	            {% if messages %}
@@ -39,20 +39,19 @@
             $('#flash-overlay-modal').modal();
         </script>
         </div>
-
-         <div class="content">
+        <div class="content">
         <h2>User Profile</h2>
         <table>
             <tr>
                 <td>Username:</td>
-                <td></td>
+<!--                <td>{{ account.username }}</td>-->
             </tr>
             <tr>
                 <td>Email:</td>
-                <td></td>
+<!--                <td>{{ account.email }}</td>-->
             </tr>
         </table>
-    </div>
+        </div>
 
     {% else %}
     <div class="content">
