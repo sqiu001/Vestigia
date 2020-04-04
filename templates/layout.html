@@ -13,6 +13,13 @@
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
 				integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
 				crossorigin="anonymous"></script>
+
+		<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script>
+            $('#flash-overlay-modal').modal();
+        </script>
+
 	</head>
 	<body class>
 		<nav class="navtop">
@@ -20,7 +27,6 @@
 				<h1>Vestigia</h1>
 				{% if account %}
 					<form action="{{ url_for('search') }}" method="post" class="active" style="padding: 15px;">
-								<label for="username"></label>
       							<input type="text" placeholder="Search User Name" name="username">
 								<button type="submit"><i class="fa fa-search"></i></button>
 						</form>
