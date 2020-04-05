@@ -239,7 +239,7 @@ def search():
         username = request.form['username']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # search by username
-        cursor.execute('SELECT * FROM tb_post WHERE user_name = %s', (username,))
+        cursor.execute('SELECT * FROM tb_post WHERE username = %s', (username,))
         account = cursor.fetchone()
         if account:
             return redirect(url_for('poster_profile', poster_id=account['user_id']))
