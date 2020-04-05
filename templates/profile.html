@@ -5,13 +5,13 @@
     {% endblock %}
 
 {% block content %}
-    {% if poster_account %}
     <div class="content">
         <h2>User Profile</h2>
+    {% if poster_account %}
         <table>
             <tr>
-                <td>Username:</td>
-                <td>{{ poster_account.username }}</td>
+                <td>User Name:</td>
+                <td>{{ poster_account.user_name }}</td>
             </tr>
             <tr>
                 <td>Email:</td>
@@ -20,11 +20,9 @@
         </table>
 
     {% else %}
-    <div class="content">
-        <h2>User Profile</h2>
         <table>
             <tr>
-                <td>Username:</td>
+                <td>User Name:</td>
                 <td>{{ account.username }}</td>
             </tr>
             <tr>
@@ -32,8 +30,24 @@
                 <td>{{ account.email }}</td>
             </tr>
         </table>
-    </div>
     {% endif %}
+         <h2>Post History</h2>
+        <div class="main" style="padding: 0; background-color: #e2e1e8; margin: 0">
+    {% for ps in post %}
+       <ul>
+            <li>
+                <div class="post-group">
+                    <p class="post-title"><a href="{{ url_for('into_reply', post_id=ps.post_id) }}">
+                        {{ ps.post_title }}</a></p>
+                    <P class="post-content">{{ ps.post_content }}</P>
+                    <div class="post-info">
+                        <span class="post-author">{{ ps.username }}</a></span>
+                        <span class="post-time">{{ ps.post_time }}</span>
+                    </div>
+                </div>
+            </li>
+       </ul>
+    {% endfor %}
+    </div>
+</div>
 {% endblock %}
-
-

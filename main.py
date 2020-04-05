@@ -167,8 +167,12 @@ def profile():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', [session['user_id']])
         account = cursor.fetchone()
+        cursor.execute('SELECT post_title, post_content, post_time, username, post_id, user_id'
+                       ' FROM tb_post WHERE user_id = %s order by -post_time', [session['user_id']])
+        # Fetch all records and return result
+        post = cursor.fetchall()
         # Show the profile page with account info
-        return render_template('profile.html', account=account)
+        return render_template('profile.html', account=account, post=post)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -235,10 +239,10 @@ def search():
         username = request.form['username']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # search by username
-        cursor.execute('SELECT * FROM tb_user WHERE username=%s', (username,))
+        cursor.execute('SELECT * FROM tb_post WHERE user_name = %s', (username,))
         account = cursor.fetchone()
         if account:
-            return render_template('profile.html', poster_account=account)
+            return redirect(url_for('poster_profile', poster_id=account['user_id']))
     flash('User does not exist')
     return redirect(url_for('home'))
 

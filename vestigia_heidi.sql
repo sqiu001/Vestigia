@@ -26,18 +26,24 @@ COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
 
-CREATE TABLE `tb_replies` (
-	`reply_id` INT(11) NOT NULL,
+CREATE TABLE `tb_reply` (
+	`reply_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`post_id` INT(11) NOT NULL,
 	`user_id` INT(11) NOT NULL,
-	`text` VARCHAR(5000) NULL DEFAULT NULL,
-	`reply_time_stamp` DATETIME NULL DEFAULT NULL,
+	`username` VARCHAR(50) NOT NULL,
+	`reply_content` TEXT NULL DEFAULT NULL,
+	`reply_time` TIMESTAMP NULL DEFAULT current_timestamp(),
 	PRIMARY KEY (`reply_id`),
 	INDEX `user_id` (`user_id`),
-	CONSTRAINT `tb_replies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `tb_user` (`user_id`)
+	INDEX `post_id` (`post_id`),
+	CONSTRAINT `tb_reply_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `tb_user` (`user_id`),
+	CONSTRAINT `tb_reply_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `tb_post` (`post_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
+AUTO_INCREMENT=2
 ;
+
 
 CREATE TABLE `tb_profile` (
 	`user_id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -51,17 +57,22 @@ AUTO_INCREMENT=5
 ;
 
 CREATE TABLE `tb_post` (
-	`post_id` INT(11) NOT NULL,
+	`post_id` INT(11) NOT NULL AUTO_INCREMENT,
 	`post_job_id` INT(11) NULL DEFAULT NULL,
+	`post_title` VARCHAR(100) NOT NULL DEFAULT '',
+	`post_content` TEXT NOT NULL DEFAULT '',
 	`user_id` INT(11) NOT NULL,
-	`post_time_stamp` DATETIME NULL DEFAULT NULL,
+	`username` VARCHAR(50) NOT NULL DEFAULT '',
+	`post_time` TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 	PRIMARY KEY (`post_id`),
 	INDEX `user_id` (`user_id`),
 	CONSTRAINT `tb_post_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `tb_user` (`user_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
+AUTO_INCREMENT=3
 ;
+
 
 CREATE TABLE `tb_job` (
 	`job_id` INT(11) NOT NULL,
