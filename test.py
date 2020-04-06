@@ -183,21 +183,24 @@ def poster_profile(poster_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (poster_id,))
     account = cursor.fetchone()
+    print('current user', session['user_id'])
+    print('other user', poster_id)
+    session['poster_id'] = poster_id
+
     cursor.execute('SELECT post_title, post_content, post_time, user_name, post_id, user_id'
                    ' FROM tb_post WHERE user_id = %s order by -post_time', (poster_id,))
     post = cursor.fetchall()
-    return render_template('profile.html', poster_account=account, post=post)
 
+    cursor.execute('SELECT * FROM tb_follows WHERE user_id = %s AND followed_user_id = %s',
+                   (session['user_id'], poster_id,))
+    followed = cursor.fetchone()
+    return render_template('profile.html', poster_account=account, post=post, followed=followed)
 
 
 # http://localhost:5000/python/logout - this will be the logout page
 @app.route('/logout/')
 def logout():
-    # Remove session data, this will log the user out
-    # session.pop('loggedin', None)
     session.pop('user_id', None)
-    # session.pop('username', None)
-    # Redirect to login page
     return redirect(url_for('login'))
 
 
@@ -241,12 +244,46 @@ def search():
         username = request.form['username']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # search by username
-        cursor.execute('SELECT * FROM tb_post WHERE user_name = %s', (username,))
+        cursor.execute('SELECT * FROM tb_user WHERE user_name = %s', (username,))
         account = cursor.fetchone()
-        if account:
+        if not account:
+            flash('User does not exist')
+            return redirect(url_for('home'))
+        elif account['user_name'] == session['username']:
+            return redirect(url_for('profile'))
+        else:
             return redirect(url_for('poster_profile', poster_id=account['user_id']))
-    flash('User does not exist')
-    return redirect(url_for('home'))
+
+
+# follow other user
+@app.route('/poster_profile/follow/', methods=['GET', 'POST'])
+def follow():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tb_follows WHERE user_id = %s AND followed_user_id = %s'
+                   , (session['user_id'], session['poster_id']))
+    followed = cursor.fetchone()
+    print("followed:", followed)
+    if not followed:
+        cursor.execute("INSERT INTO tb_follows (user_id, followed_user_id)"
+                       " VALUES (%s, %s)", (session['user_id'], session['poster_id']))
+        mysql.connection.commit()
+        following = cursor.fetchone()
+        print("following:", following)
+        return redirect(url_for('poster_profile', poster_id=session['poster_id']))
+    return redirect(url_for('poster_profile', poster_id=followed['followed_user_id']))
+
+
+# unfollow other user
+@app.route('/unFollow/', methods=['GET', 'POST'])
+def unfollow():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('DELETE FROM tb_follows WHERE user_id = % s AND followed_user_id = % s',
+                   (session['user_id'], session['poster_id']))
+    mysql.connection.commit()
+
+    return redirect(url_for('poster_profile', poster_id=session['poster_id']))
+
+
 
 
 if __name__ == '__main__':

@@ -18,6 +18,17 @@
                 <td>{{ poster_account.email }}</td>
             </tr>
         </table>
+        {% if followed %}
+            <hr>
+            <form action="{{ url_for('unfollow') }}"  method="post">
+            <button class="btn btn-primary">UnFollow This User</button>
+            </form>
+        {% else %}
+            <hr>
+            <form action="{{ url_for('follow') }}"  method="post">
+            <button class="btn btn-primary">Follow Me</button>
+            </form>
+        {% endif %}
 
     {% else %}
         <table>
@@ -31,6 +42,7 @@
             </tr>
         </table>
     {% endif %}
+
          <h2>Post History</h2>
         <div class="main" style="padding: 0; background-color: #e2e1e8; margin: 0">
     {% for ps in post %}
@@ -49,6 +61,7 @@
        </ul>
     {% endfor %}
     </div>
-</div>
+ </div>
+
 {% endblock %}
 

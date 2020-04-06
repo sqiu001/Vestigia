@@ -43,9 +43,8 @@ insert into tb_profile (profile_display_name, profile_avatar) values
 
 -- create table follows
 create table tb_follows (
-	user_id int not null,
-    followed_user_id int not null,
-    primary key (followed_user_id)
+	user_id int,
+    followed_user_id int
     );
     
 -- create table post
