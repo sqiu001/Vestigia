@@ -171,7 +171,12 @@ def profile():
         # Fetch all records and return result
         post = cursor.fetchall()
         # Show the profile page with account info
-        return render_template('profile.html', account=account, post=post)
+        cursor.execute('SELECT tb_user.user_name, tb_follows.user_id, tb_follows.followed_user_id FROM'
+                       ' tb_user INNER JOIN tb_follows ON tb_follows.followed_user_id = tb_user.user_id '
+                       'WHERE tb_follows.user_id = %s', [session['user_id']])
+        followed = cursor.fetchall()
+        print('followed', followed)
+        return render_template('profile.html', account=account, post=post, followed=followed)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -186,6 +191,9 @@ def poster_profile(poster_id):
     print('current user', session['user_id'])
     print('other user', poster_id)
     session['poster_id'] = poster_id
+    if session['user_id'] == account['user_id']:
+        print("same")
+        return redirect(url_for('profile'))
 
     cursor.execute('SELECT post_title, post_content, post_time, user_name, post_id, user_id'
                    ' FROM tb_post WHERE user_id = %s order by -post_time', (poster_id,))
@@ -282,8 +290,6 @@ def unfollow():
     mysql.connection.commit()
 
     return redirect(url_for('poster_profile', poster_id=session['poster_id']))
-
-
 
 
 if __name__ == '__main__':
