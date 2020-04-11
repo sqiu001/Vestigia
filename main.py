@@ -102,7 +102,8 @@ def login():
     return render_template('login.html', msg=msg)
 
 
-# http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST requests
+# http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST
+# requests
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     # Output message if something goes wrong...
@@ -171,8 +172,13 @@ def profile():
                        ' FROM tb_post WHERE user_id = %s order by -post_time', [session['user_id']])
         # Fetch all records and return result
         post = cursor.fetchall()
+        cursor.execute('SELECT tb_user.username, tb_follows.user_id, tb_follows.followed_user_id FROM'
+                       ' tb_user INNER JOIN tb_follows ON tb_follows.followed_user_id = tb_user.user_id '
+                       'WHERE tb_follows.user_id = %s', [session['user_id']])
+        followed = cursor.fetchall()
+        print('followed', followed)
         # Show the profile page with account info
-        return render_template('profile.html', account=account, post=post)
+        return render_template('profile.html', account=account, post=post, followed=followed)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -184,7 +190,21 @@ def poster_profile(poster_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (poster_id,))
     account = cursor.fetchone()
-    return render_template('profile.html', poster_account=account)
+    print('current user', session['user_id'])
+    print('other user', poster_id)
+    session['poster_id'] = poster_id
+
+    cursor.execute('SELECT post_title, post_content, post_time, username, post_id, user_id'
+                   ' FROM tb_post WHERE user_id = %s order by -post_time', (poster_id,))
+    post = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM tb_follows WHERE user_id = %s AND followed_user_id = %s',
+                   (session['user_id'], poster_id,))
+    followed = cursor.fetchone()
+    if session['user_id'] == account['user_id']:
+        return redirect(url_for('profile'))
+    else:
+        return render_template('profile.html', poster_account=account, post=post, followed=followed)
 
 
 # http://localhost:5000/python/logout - this will be the logout page
@@ -239,12 +259,60 @@ def search():
         username = request.form['username']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # search by username
-        cursor.execute('SELECT * FROM tb_post WHERE username = %s', (username,))
+        cursor.execute('SELECT * FROM tb_user WHERE username = %s', (username,))
         account = cursor.fetchone()
-        if account:
+        if not account:
+            flash('User does not exist')
+            return redirect(url_for('home'))
+        elif account['username'] == session['username']:
+            return redirect(url_for('profile'))
+        else:
             return redirect(url_for('poster_profile', poster_id=account['user_id']))
-    flash('User does not exist')
-    return redirect(url_for('home'))
+
+
+# follow other user
+@app.route('/poster_profile/follow/', methods=['GET', 'POST'])
+def follow():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tb_follows WHERE user_id = %s AND followed_user_id = %s'
+                   , (session['user_id'], session['poster_id']))
+    followed = cursor.fetchone()
+    print("followed:", followed)
+    if not followed:
+        cursor.execute("INSERT INTO tb_follows (user_id, followed_user_id)"
+                       " VALUES (%s, %s)", (session['user_id'], session['poster_id']))
+        mysql.connection.commit()
+        following = cursor.fetchone()
+        print("following:", following)
+        return redirect(url_for('poster_profile', poster_id=session['poster_id']))
+    return redirect(url_for('poster_profile', poster_id=followed['followed_user_id']))
+
+
+# unfollow other user
+@app.route('/unFollow/', methods=['GET', 'POST'])
+def unfollow():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('DELETE FROM tb_follows WHERE user_id = % s AND followed_user_id = % s',
+                   (session['user_id'], session['poster_id']))
+    mysql.connection.commit()
+
+    return redirect(url_for('poster_profile', poster_id=session['poster_id']))
+
+
+# @app.route('/follow/<username>')
+# @login_required
+# def follow(username):
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute('SELECT * FROM tb_user WHERE username = %s', (username,))
+#     poster_account = cursor.fetchone()
+#     if not poster_account:
+#         flash('User {} not found.'.format(username))
+#         return redirect(url_for('home'))
+#     if poster_account:
+#         cursor.execute('INSERT INTO tb_follows VALUES (%s,%s)', (session['user_id'], poster_account['user_id']))
+#         mysql.connection.commit()
+#         flash('You are following {}!')
+#         return render_template('profile.html', poster_account=poster_account)
 
 
 # @app.route('/users/', methods=['GET', 'POST'])

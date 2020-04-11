@@ -17,7 +17,7 @@
             <form action="{{ url_for('add_reply') }}" method="post">
                 <div class="form-group">
                 <textarea name="reply_content"  rows="7" placeholder="Enter Reply Here..."
-                          class="form-control"></textarea>
+                          class="form-control" required></textarea>
                 </div>
                 <div class="form-group" style="text-align: right;">
                     <div class="msg">{{ msg }}</div>
@@ -43,7 +43,7 @@
                 <div class="reply-info">
                     <li>
                         <span class="reply-author"><a href="{{ url_for('poster_profile', poster_id=foo.user_id) }}">
-                            {{ foo.user_name }}</a></span>
+                            {{ foo.username }}</a></span>
                     <span class="reply-time">{{ foo.reply_time }}</span>
                      <p class="reply-content">{{foo.reply_content}}</p>
                     </li>

@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title %}Vestigia Home{% endblock %}
     {% block nav %}
-    <a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+<a href="{{ url_for('post') }}" xmlns="http://www.w3.org/1999/html"><i class="fas fa-post"></i>Post</a>
     {% endblock %}
 
 {% block content %}
@@ -18,8 +18,17 @@
                 <td>{{ poster_account.email }}</td>
             </tr>
         </table>
-        <button class="btn btn-primary btn-block" style="width: 100px; display:inline-block">Follow</button>
-        <button class="btn btn-primary btn-block" style="width: 100px; display:inline-block;vertical-align: bottom">Unfollow</button>
+        {% if followed %}
+            <hr>
+            <form action="{{ url_for('unfollow') }}"  method="post">
+            <button class="btn btn-primary">UnFollow This User</button>
+            </form>
+        {% else %}
+            <hr>
+            <form action="{{ url_for('follow') }}"  method="post">
+            <button class="btn btn-primary">Follow Me</button>
+            </form>
+        {% endif %}
 
     {% else %}
         <table>
@@ -31,8 +40,17 @@
                 <td>Email:</td>
                 <td>{{ account.email }}</td>
             </tr>
-        </table>
+            </table>
+        <h2>Followed List:</h2>
+            {% for f in followed %}
+                <a href="{{ url_for('poster_profile', poster_id=f.followed_user_id) }}">
+                     <button class="btn btn-primary" style="font-size: 15px; width: 100px;
+                 margin:10px 20px; word-break: break-all; height: 50px; ">{{ f.username }}</button></a>
+           {% endfor %}
+
+
     {% endif %}
+
          <h2>Post History</h2>
         <div class="main" style="padding: 0; background-color: #e2e1e8; margin: 0">
     {% for ps in post %}
@@ -51,5 +69,6 @@
        </ul>
     {% endfor %}
     </div>
-</div>
+ </div>
+
 {% endblock %}
