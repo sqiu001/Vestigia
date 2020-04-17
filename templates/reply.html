@@ -7,7 +7,7 @@
 <div class="main">
     <h2 class="page-title"> {{ posted.post_title}} </h2>
     <p class="posted-info">
-        <span style="margin-left: 10px; font-weight: 700">Author: {{ posted.username}}</span>
+        <span style="margin-left: 10px; font-weight: 700">Author: {{ posted.user_name}}</span>
         <span style="float: right; margin-right: 10px;font-weight: 700">Published: {{ posted.post_time}}</span>
     </p>
         <hr>
@@ -43,7 +43,7 @@
                 <div class="reply-info">
                     <li>
                         <span class="reply-author"><a href="{{ url_for('poster_profile', poster_id=foo.user_id) }}">
-                            {{ foo.username }}</a></span>
+                            {{ foo.user_name }}</a></span>
                     <span class="reply-time">{{ foo.reply_time }}</span>
                      <p class="reply-content">{{foo.reply_content}}</p>
                     </li>
@@ -52,3 +52,5 @@
             </ul>
 </div>
 {% endblock %}
+
+

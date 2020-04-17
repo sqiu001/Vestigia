@@ -26,12 +26,12 @@
 			<div>
 				<h1>Vestigia</h1>
 				{% if account %}
-					<form action="{{ url_for('search') }}" method="post" class="active" style="padding: 5px;">
+					<form action="{{ url_for('search') }}" method="post" class="active" style="padding: 15px;">
       							<input type="text" placeholder="Search User Name" name="username" required>
 								<button type="submit"><i class="fa fa-search"></i></button>
 						</form>
 					<a href="/"><i class="fas fa-home"></i>Home</a>
-					<a href="{{ url_for('profile') }}">User: {{ account.username }}</a>
+					<a href="{{ url_for('profile') }}">User: {{ account.user_name }}</a>
 					{% block nav %}{% endblock %}
 					<a href="{{ url_for('logout') }}"><i class="fas fa-sign"></i>Logout</a>
 				{% else %}

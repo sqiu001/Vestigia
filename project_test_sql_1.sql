@@ -3,7 +3,16 @@ CREATE DATABASE DATABASE_PROJECT;
 use DATABASE_PROJECT;
 
 --  create table user
-CREATE TABLE tb_user ( 
+CREATE TABLE user (
+	user_id INTEGER PRIMARY KEY AUTO_INCREMENT = 100,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	username VARCHAR(50),
+	password VARCHAR(50),
+	email VARCHAR(100)
+);
+
+CREATE TABLE tb_user (
 	user_id INT AUTO_INCREMENT,
     user_name varchar(50),
     user_password varchar(50),
@@ -12,12 +21,12 @@ CREATE TABLE tb_user (
 	email VARCHAR(100),
      PRIMARY KEY (user_id)
 	);
- 
+
 -- setting user_id auto increment from 100
 ALTER TABLE tb_user AUTO_INCREMENT = 100;
 
 -- insert test data for user
-insert into tb_user (user_name, user_password, email) values 
+insert into tb_user (user_name, user_password, email) values
 ('test1', '1', 'www.111@111.com'),
 ('test2', '1', 'www.222@222.com'),
 ('test3', '1', 'www.333@333.com'),
@@ -27,7 +36,7 @@ insert into tb_user (user_name, user_password, email) values
 create table tb_profile (
 	user_id INT auto_increment,
     profile_display_name varchar (50),
-    profile_avatar bit default 1,       -- 0 means job seeker, 1 means HR 
+    profile_avatar bit default 1,       -- 0 means job seeker, 1 means HR
     primary key (user_id)
     );
 
@@ -35,7 +44,7 @@ create table tb_profile (
 ALTER TABLE tb_profile AUTO_INCREMENT = 100;
 
 -- insert test data for profile
-insert into tb_profile (profile_display_name, profile_avatar) values 
+insert into tb_profile (profile_display_name, profile_avatar) values
 ('AAA', 0),
 ('BBB', 1),
 ('CCC', 0),
@@ -46,7 +55,7 @@ create table tb_follows (
 	user_id int,
     followed_user_id int
     );
-    
+
 -- create table post
 create table tb_post (
 	post_id int auto_increment,
@@ -59,7 +68,7 @@ create table tb_post (
     primary key (post_id),
     foreign key (user_id) references tb_user (user_id)
 	);
-    
+
 ALTER TABLE tb_post AUTO_INCREMENT = 500;
 
 -- create table reply
@@ -95,6 +104,3 @@ create table tb_status (
     status_time_stamp datetime,
     primary key (job_id)
 	);
-
-    
-	

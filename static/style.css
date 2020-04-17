@@ -1,3 +1,4 @@
+
 body {
   	background-color: #435165;
   	margin: 0;
@@ -106,25 +107,6 @@ body {
 .navtop div a:hover {
   	color: #eaebed;
 }
-
-.navtop input[type=text]{
-  padding: 6px;
-  margin-top: 8px;
-  font-size: 17px;
-  border: none;
-  }
-
-.navtop button[type=submit]{
-  float: right;
-  padding: 6px 10px;
-  margin-top: 8px;
-  margin-right: 16px;
-  background: #ddd;
-  font-size: 17px;
-  border: none;
-  cursor: pointer;
-}
-
 body.loggedin {
   	background-color: #f3f4f7;
 }
