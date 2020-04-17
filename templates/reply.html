@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+{% block title %}Vestigia Reply{% endblock %}
+{% block nav %}
+<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+{% endblock %}
+{% block content %}
+<div class="main">
+    <h2 class="page-title"> {{ posted.post_title}} </h2>
+    <p class="posted-info">
+        <span style="margin-left: 10px; font-weight: 700">Author: {{ posted.username}}</span>
+        <span style="float: right; margin-right: 10px;font-weight: 700">Published: {{ posted.post_time}}</span>
+    </p>
+        <hr>
+        <p class="post-content">{{ posted.post_content }}</p>
+        <hr>
+        <h4 style="margin:10px 10px;">Reply</h4>
+            <form action="{{ url_for('add_reply') }}" method="post">
+                <div class="form-group">
+                <textarea name="reply_content"  rows="7" placeholder="Enter Reply Here..."
+                          class="form-control" required></textarea>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <div class="msg">{{ msg }}</div>
+                    <button class="btn btn-primary btn-block">Send</button>
+                </div>
+            </form>
+    <div class="show-message" style="text-align: center; width: 360px; margin:0 auto;">
+     {% with messages = get_flashed_messages() %}
+     {% if messages %}
+     {% for message in messages %}
+     <div class="alert alert-warning alert-dismissible" role="alert">
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+             <span aria-hidden="true">×</span></button>
+             {{message}}
+     </div>
+     {% endfor %}
+     {% endif %}
+     {% endwith %}
+ </div>
+        <hr>
+            <ul class="reply-list">
+                {% for foo in reply %}
+                <div class="reply-info">
+                    <li>
+                        <span class="reply-author"><a href="{{ url_for('poster_profile', poster_id=foo.user_id) }}">
+                            {{ foo.username }}</a></span>
+                    <span class="reply-time">{{ foo.reply_time }}</span>
+                     <p class="reply-content">{{foo.reply_content}}</p>
+                    </li>
+                </div>
+                {% endfor %}
+            </ul>
+</div>
+{% endblock %}

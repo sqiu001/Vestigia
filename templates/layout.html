@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>{% block title %}{% endblock %}</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+			  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+			  crossorigin="anonymous">
+		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+				integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+				crossorigin="anonymous"></script>
+
+		<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script>
+            $('#flash-overlay-modal').modal();
+        </script>
+
+	</head>
+	<body class>
+		<nav class="navtop">
+			<div>
+				<h1>Vestigia</h1>
+				{% if account %}
+					<form action="{{ url_for('search') }}" method="post" class="active" style="padding: 5px;">
+      							<input type="text" placeholder="Search User Name" name="username" required>
+								<button type="submit"><i class="fa fa-search"></i></button>
+						</form>
+					<a href="/"><i class="fas fa-home"></i>Home</a>
+					<a href="{{ url_for('profile') }}">User: {{ account.username }}</a>
+					{% block nav %}{% endblock %}
+					<a href="{{ url_for('logout') }}"><i class="fas fa-sign"></i>Logout</a>
+				{% else %}
+					<form action="{{ url_for('search') }}" method="post" class="search" style="padding: 15px;">
+      							<input type="text" placeholder="Search User Name" name="username">
+								<button type="submit"><i class="fa fa-search"></i></button>
+						</form>
+                	<a href="/"><i class="fas fa-home"></i>Home</a>
+					<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+					<a href="{{ url_for('login') }}"><i class="fas fa-sign"></i>Login/Register</a>
+				{% endif %}
+			</div>
+		</nav>
+		{% block content %}{% endblock %}
+	</body>
+</html>

@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+{% block title %}Vestigia Home{% endblock %}
+    {% block nav %}
+<a href="{{ url_for('post') }}" xmlns="http://www.w3.org/1999/html"><i class="fas fa-post"></i>Post</a>
+    {% endblock %}
+
+{% block content %}
+    <div class="content">
+        <h2>User Profile</h2>
+    {% if poster_account %}
+        <table>
+            <tr>
+                <td>User Name:</td>
+                <td>{{ poster_account.username }}</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td>{{ poster_account.email }}</td>
+            </tr>
+        </table>
+        {% if followed %}
+            <hr>
+            <form action="{{ url_for('unfollow') }}"  method="post">
+            <button class="btn btn-primary">UnFollow This User</button>
+            </form>
+        {% else %}
+            <hr>
+            <form action="{{ url_for('follow') }}"  method="post">
+            <button class="btn btn-primary">Follow Me</button>
+            </form>
+        {% endif %}
+
+    {% else %}
+        <table>
+            <tr>
+                <td>User Name:</td>
+                <td>{{ account.username }}</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td>{{ account.email }}</td>
+            </tr>
+            </table>
+        <h2>Followed List:</h2>
+            {% for f in followed %}
+                <a href="{{ url_for('poster_profile', poster_id=f.followed_user_id) }}">
+                     <button class="btn btn-primary" style="font-size: 15px; width: 100px;
+                 margin:10px 20px; word-break: break-all; height: 50px; ">{{ f.username }}</button></a>
+           {% endfor %}
+
+
+    {% endif %}
+
+         <h2>Post History</h2>
+        <div class="main" style="padding: 0; background-color: #e2e1e8; margin: 0">
+    {% for ps in post %}
+       <ul>
+            <li>
+                <div class="post-group">
+                    <p class="post-title"><a href="{{ url_for('into_reply', post_id=ps.post_id) }}">
+                        {{ ps.post_title }}</a></p>
+                    <P class="post-content">{{ ps.post_content }}</P>
+                    <div class="post-info">
+                        <span class="post-author">{{ ps.username }}</a></span>
+                        <span class="post-time">{{ ps.post_time }}</span>
+                    </div>
+                </div>
+            </li>
+       </ul>
+    {% endfor %}
+    </div>
+ </div>
+
+{% endblock %}

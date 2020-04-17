@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% block title %}Vestigia Home{% endblock %}
+{% block nav %}
+<a href="{{ url_for('post') }}"><i class="fas fa-post"></i>Post</a>
+{% endblock %}
+
+{% block content %}
+ <div class="show-message" style="text-align: center; width: 360px; margin:0 auto;">
+     {% with messages = get_flashed_messages() %}
+     {% if messages %}
+     {% for message in messages %}
+     <div class="alert alert-warning alert-dismissible" role="alert">
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+             <span aria-hidden="true">×</span></button>
+             {{message}}
+     </div>
+     {% endfor %}
+     {% endif %}
+     {% endwith %}
+ </div>
+
+<h2 class="page-title">Home</h2>
+
+<div class="main">
+
+    {% for ps in post %}
+       <ul>
+            <li>
+                <div class="post-group">
+                    <p class="post-title"><a href="{{ url_for('into_reply', post_id=ps.post_id) }}">
+                        {{ ps.post_title }}</a></p>
+                    <P class="post-content">{{ ps.post_content }}</P>
+                    <div class="post-info">
+                        <span class="post-author"><a href="{{ url_for('poster_profile', poster_id=ps.user_id) }}">
+                            {{ ps.username }}</a></span>
+                        <span class="post-time">{{ ps.post_time }}</span>
+                    </div>
+                </div>
+            </li>
+       </ul>
+    {% endfor %}
+</div>
+{% endblock %}
