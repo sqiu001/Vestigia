@@ -1,39 +1,21 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>Register</title>
-		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-	</head>
-	<body>
+{% extends 'layout.html' %}
+{% block title %}Vestigia Register{% endblock %}
+{% block content %}
 		<div class="register">
-			<h1>Vestigia</h1>
+			<h1>Join Us Today !</h1>
 			<div class="links">
 				<a href="{{ url_for('login') }}">Login</a>
 				<a href="{{ url_for('register') }}" class="active">Register</a>
 			</div>
 			<form action="{{ url_for('register') }}" method="post" autocomplete="off">
-				<label for="first_name">
-					<i class="fas fa-user"></i>
-				</label>
-				<input type="text" name="first_name" placeholder="First Name" id="first_name" required>
-
-				<label for="last_name">
-					<i class="fas fa-user"></i>
-				</label>
-				<input type="text" name="last_name" placeholder="Last Name" id="last_name" required>
-
 				<label for="username">
 					<i class="fas fa-user"></i>
 				</label>
 				<input type="text" name="username" placeholder="Username" id="username" required>
-
 				<label for="password">
 					<i class="fas fa-lock"></i>
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password" required>
-
 				<label for="email">
 					<i class="fas fa-envelope"></i>
 				</label>
@@ -42,5 +24,4 @@
 				<input type="submit" value="Register">
 			</form>
 		</div>
-	</body>
-</html>
+{% endblock %}
