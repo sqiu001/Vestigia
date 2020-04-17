@@ -12,4 +12,6 @@
 
 6. In your browser head to http://localhost:5000/
 
+7. Or run from PyCharm and go to browser
+
 In doing so, any changes you make will be reflected upon refreshing the browser, that way you don't have to constantly restart the web server
