@@ -11,7 +11,7 @@
         <table>
             <tr>
                 <td>User Name:</td>
-                <td>{{ poster_account.username }}</td>
+                <td>{{ poster_account.user_name }}</td>
             </tr>
             <tr>
                 <td>Email:</td>
@@ -34,7 +34,7 @@
         <table>
             <tr>
                 <td>User Name:</td>
-                <td>{{ account.username }}</td>
+                <td>{{ account.user_name }}</td>
             </tr>
             <tr>
                 <td>Email:</td>
@@ -45,7 +45,7 @@
             {% for f in followed %}
                 <a href="{{ url_for('poster_profile', poster_id=f.followed_user_id) }}">
                      <button class="btn btn-primary" style="font-size: 15px; width: 100px;
-                 margin:10px 20px; word-break: break-all; height: 50px; ">{{ f.username }}</button></a>
+                 margin:10px 20px; word-break: break-all; height: 50px; ">{{ f.user_name }}</button></a>
            {% endfor %}
 
 
@@ -61,7 +61,7 @@
                         {{ ps.post_title }}</a></p>
                     <P class="post-content">{{ ps.post_content }}</P>
                     <div class="post-info">
-                        <span class="post-author">{{ ps.username }}</a></span>
+                        <span class="post-author">{{ ps.user_name }}</a></span>
                         <span class="post-time">{{ ps.post_time }}</span>
                     </div>
                 </div>

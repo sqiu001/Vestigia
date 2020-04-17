@@ -35,7 +35,7 @@ def login_required(func):  # login required decorator
 @app.route("/")  # home page
 def home():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT post_title, post_content, post_time, username, post_id, user_id'
+    cursor.execute('SELECT post_title, post_content, post_time, user_name, post_id, user_id'
                    ' FROM tb_post order by -post_time')
     # Fetch all records and return result
     post = cursor.fetchall()
@@ -51,7 +51,7 @@ def into_reply(post_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM tb_post WHERE post_id = %s', (post_id,))
     posted = cursor.fetchone()
-    cursor.execute('SELECT reply_content, reply_time, username, user_id, post_id'
+    cursor.execute('SELECT reply_content, reply_time, user_name, user_id, post_id'
                    ' FROM tb_reply WHERE post_id = %s order by -reply_time', (post_id,))
     reply = cursor.fetchall()
     session['post_id'] = posted['post_id']
@@ -63,10 +63,11 @@ def into_reply(post_id):
 def add_reply():
     reply_content = request.form['reply_content']
     if not reply_content:
+        flash('Please fill out the form!')
         return redirect(url_for('into_reply', post_id=session['post_id']))
     else:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('INSERT INTO tb_reply (username, user_id, reply_content, post_id) VALUES '
+        cursor.execute('INSERT INTO tb_reply (user_name, user_id, reply_content, post_id) VALUES '
                        '(%s, %s, %s, %s)', (session['username'], session['user_id'], reply_content, session['post_id']))
         mysql.connection.commit()
         return redirect(url_for('into_reply', post_id=session['post_id']))
@@ -83,7 +84,7 @@ def login():
         password = request.form['password']
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM tb_user WHERE username = %s AND password = %s', (username, password))
+        cursor.execute('SELECT * FROM tb_user WHERE user_name = %s AND user_password = %s', (username, password))
         # Fetch one record and return result
         account = cursor.fetchone()
         # If account exists in accounts table in out database
@@ -91,7 +92,7 @@ def login():
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
             session['user_id'] = account['user_id']
-            session['username'] = account['username']
+            session['username'] = account['user_name']
             # session['password'] = account['user_password']
             # Redirect to home page
             return redirect(url_for('profile'))
@@ -102,14 +103,14 @@ def login():
     return render_template('login.html', msg=msg)
 
 
-# http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST
-# requests
+# http://localhost:5000/pythinlogin/register - this will be the registration page, we need to use both GET and POST requests
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     # Output message if something goes wrong...
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'first_name' in request.form and 'last_name' in request.form and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+    if request.method == 'POST' and 'first_name' in request.form and 'last_name' in request.form and 'username' in \
+            request.form and 'password' in request.form and 'email' in request.form:
         # Create variables for easy access
         first_name = request.form['first_name']
         last_name = request.form['last_name']
@@ -145,10 +146,11 @@ def register():
     # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
 
-
+# display current user on navigation bar
 @app.context_processor
 def my_context_processor():
     user_id = session.get('user_id')
+    print('user_id', user_id)
     if user_id:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', (user_id,))
@@ -160,7 +162,7 @@ def my_context_processor():
 
 
 # http://localhost:5000/pythinlogin/profile - this will be the profile page, only accessible for loggedin users
-@app.route('/profile/')
+@app.route('/profile/myProfile')
 def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
@@ -168,16 +170,16 @@ def profile():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM tb_user WHERE user_id = %s', [session['user_id']])
         account = cursor.fetchone()
-        cursor.execute('SELECT post_title, post_content, post_time, username, post_id, user_id'
+        cursor.execute('SELECT post_title, post_content, post_time, user_name, post_id, user_id'
                        ' FROM tb_post WHERE user_id = %s order by -post_time', [session['user_id']])
         # Fetch all records and return result
         post = cursor.fetchall()
-        cursor.execute('SELECT tb_user.username, tb_follows.user_id, tb_follows.followed_user_id FROM'
+        # Show the profile page with account info
+        cursor.execute('SELECT tb_user.user_name, tb_follows.user_id, tb_follows.followed_user_id FROM'
                        ' tb_user INNER JOIN tb_follows ON tb_follows.followed_user_id = tb_user.user_id '
                        'WHERE tb_follows.user_id = %s', [session['user_id']])
         followed = cursor.fetchall()
         print('followed', followed)
-        # Show the profile page with account info
         return render_template('profile.html', account=account, post=post, followed=followed)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
@@ -193,33 +195,28 @@ def poster_profile(poster_id):
     print('current user', session['user_id'])
     print('other user', poster_id)
     session['poster_id'] = poster_id
+    if session['user_id'] == account['user_id']:
+        print("same")
+        return redirect(url_for('profile'))
 
-    cursor.execute('SELECT post_title, post_content, post_time, username, post_id, user_id'
+    cursor.execute('SELECT post_title, post_content, post_time, user_name, post_id, user_id'
                    ' FROM tb_post WHERE user_id = %s order by -post_time', (poster_id,))
     post = cursor.fetchall()
 
     cursor.execute('SELECT * FROM tb_follows WHERE user_id = %s AND followed_user_id = %s',
                    (session['user_id'], poster_id,))
     followed = cursor.fetchone()
-    if session['user_id'] == account['user_id']:
-        return redirect(url_for('profile'))
-    else:
-        return render_template('profile.html', poster_account=account, post=post, followed=followed)
+    return render_template('profile.html', poster_account=account, post=post, followed=followed)
 
 
 # http://localhost:5000/python/logout - this will be the logout page
 @app.route('/logout/')
 def logout():
-    # Remove session data, this will log the user out
-    # session.pop('loggedin', None)
     session.pop('user_id', None)
-    # session.pop('username', None)
-
-    # Redirect to login page
     return redirect(url_for('login'))
 
 
-@app.route('/profile/post', methods=['GET', 'POST'])
+@app.route('/post/', methods=['GET', 'POST'])
 @login_required
 def post():
     msg = ''
@@ -234,17 +231,17 @@ def post():
         post = cursor.fetchone()
         # If account exists show error and validation checks
         if post:
-            session['post_id'] = post['post_id']
             msg = 'Error: Title already exists!\n'
         elif not title or not content:
             msg = 'Error: Please fill out the form!\n'
         else:
             msg = 'You have successfully posted!'
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id, username)"
+            cursor.execute("INSERT INTO tb_post (post_title, post_content, user_id, user_name)"
                            " VALUES (%s, %s, %s, %s)", (title, content, session['user_id'], session['username']))
             mysql.connection.commit()
             return redirect(url_for('home'))
+
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
@@ -259,12 +256,12 @@ def search():
         username = request.form['username']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # search by username
-        cursor.execute('SELECT * FROM tb_user WHERE username = %s', (username,))
+        cursor.execute('SELECT * FROM tb_user WHERE user_name = %s', (username,))
         account = cursor.fetchone()
         if not account:
             flash('User does not exist')
             return redirect(url_for('home'))
-        elif account['username'] == session['username']:
+        elif account['user_name'] == session['username']:
             return redirect(url_for('profile'))
         else:
             return redirect(url_for('poster_profile', poster_id=account['user_id']))
@@ -298,33 +295,6 @@ def unfollow():
 
     return redirect(url_for('poster_profile', poster_id=session['poster_id']))
 
-
-# @app.route('/follow/<username>')
-# @login_required
-# def follow(username):
-#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cursor.execute('SELECT * FROM tb_user WHERE username = %s', (username,))
-#     poster_account = cursor.fetchone()
-#     if not poster_account:
-#         flash('User {} not found.'.format(username))
-#         return redirect(url_for('home'))
-#     if poster_account:
-#         cursor.execute('INSERT INTO tb_follows VALUES (%s,%s)', (session['user_id'], poster_account['user_id']))
-#         mysql.connection.commit()
-#         flash('You are following {}!')
-#         return render_template('profile.html', poster_account=poster_account)
-
-
-# @app.route('/users/', methods=['GET', 'POST'])
-# @login_required
-# def users():
-#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cursor.execute('SELECT first_name, last_name, username, email, user_id'
-#                    ' FROM tb_user')
-#     user = cursor.fetchall()
-#     if user:
-#         return render_template('user_profile.html', user=user)
-#     return render_template('user_profile.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

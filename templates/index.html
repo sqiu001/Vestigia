@@ -19,7 +19,7 @@
      {% endwith %}
  </div>
 
-<h2 class="page-title">Home</h2>
+<h2>This is home page</h2>
 
 <div class="main">
 
@@ -32,7 +32,7 @@
                     <P class="post-content">{{ ps.post_content }}</P>
                     <div class="post-info">
                         <span class="post-author"><a href="{{ url_for('poster_profile', poster_id=ps.user_id) }}">
-                            {{ ps.username }}</a></span>
+                            {{ ps.user_name }}</a></span>
                         <span class="post-time">{{ ps.post_time }}</span>
                     </div>
                 </div>
