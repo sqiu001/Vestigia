@@ -13,7 +13,7 @@ CREATE TABLE `tb_user` (
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=5
+AUTO_INCREMENT=10
 ;
 
 CREATE TABLE `tb_status` (
@@ -44,7 +44,6 @@ ENGINE=InnoDB
 AUTO_INCREMENT=2
 ;
 
-
 CREATE TABLE `tb_profile` (
 	`user_id` INT(11) NOT NULL AUTO_INCREMENT,
 	`profile_display_name` VARCHAR(50) NULL DEFAULT NULL,
@@ -70,9 +69,8 @@ CREATE TABLE `tb_post` (
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=3
+AUTO_INCREMENT=14
 ;
-
 
 CREATE TABLE `tb_job` (
 	`job_id` INT(11) NOT NULL,
@@ -91,9 +89,11 @@ ENGINE=InnoDB
 CREATE TABLE `tb_follows` (
 	`user_id` INT(11) NOT NULL,
 	`followed_user_id` INT(11) NOT NULL,
-	PRIMARY KEY (`followed_user_id`)
+	INDEX `FK_tb_follows_tb_user` (`user_id`),
+	INDEX `FK_tb_follows_tb_user_2` (`followed_user_id`),
+	CONSTRAINT `FK_tb_follows_tb_user` FOREIGN KEY (`user_id`) REFERENCES `tb_user` (`user_id`),
+	CONSTRAINT `FK_tb_follows_tb_user_2` FOREIGN KEY (`followed_user_id`) REFERENCES `tb_user` (`user_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
-
