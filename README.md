@@ -15,20 +15,20 @@
 
 # File Structure & Setup
 **Each file will contain the following:**
-- \-- vestigia
+-\-- vestigia
   |-- main.py
   |-- database.sql
-  \-- static
+ - \-- static
     |-- style.css
     |-- base.css
-  \-- templates
+ - \-- templates
     |-- index.html
     |-- register.html
     |-- home.html
     |-- profile.html
     |-- post.html
     |-- reply.html
-    |-- layout.html
+    |-- layout.html**
 
   - main.py — This will be our main project file, all our Python code will be in this file (Routes, MySQL connection, validation, etc).
   - index.html — home page created with HTML5 and CSS3.
