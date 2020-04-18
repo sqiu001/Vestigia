@@ -15,14 +15,13 @@
 
 # File Structure & Setup
 **Each file will contain the following:
-
-**- \-- vestigia
+\-- vestigia
   |-- main.py
   |-- database.sql
- - \-- static
+  \-- static
     |-- style.css
     |-- base.css
- - \-- templates
+  \-- templates
     |-- index.html
     |-- register.html
     |-- home.html
