@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `tb_reply` (
   `reply_id` int(11) NOT NULL AUTO_INCREMENT,
   `post_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
+  `user_name` varchar(50) NOT NULL,
   `reply_content` text DEFAULT NULL,
   `reply_time` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`reply_id`),
