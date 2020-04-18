@@ -15,6 +15,7 @@
 
 # File Structure & Setup
 **Each file will contain the following:**
+
 -\-- vestigia
   |-- main.py
   |-- database.sql
