@@ -29,6 +29,7 @@
     |-- post.html
     |-- reply.html
     |-- layout.html**
+
   - main.py — This will be our main project file, all our Python code will be in this file (Routes, MySQL connection, validation, etc).
   - index.html — home page created with HTML5 and CSS3.
   - register.html — Registration form created with HTML5 and CSS3.
@@ -43,10 +44,10 @@
 - Make sure your MySQL server is up and running, it should have automatically started if you installed it via the installer.
 - Make sure the database connection details below (in python) and your database should follow:
 - app.secret_key = '111'
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '111111'
-app.config['MYSQL_DB'] = 'database_project'
+- app.config['MYSQL_HOST'] = 'localhost'
+- app.config['MYSQL_USER'] = 'root'
+- app.config['MYSQL_PASSWORD'] = '111111'
+- app.config['MYSQL_DB'] = 'database_project'
 - Open Command Prompt, make sure you have the project directory selected, you can do this with the command cd c:\your_project_folder_destination\python main.py on Windows.
 
 # If you see the following information, you have successfully run the web application
