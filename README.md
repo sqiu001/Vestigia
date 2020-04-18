@@ -12,24 +12,22 @@
   - Install Flask-MySQLdb with the command: pip install flask-mysqldb
   - ALSO, All requirements package will be on the requirements.txt and here is the references to check python flask installation: https://flask.palletsprojects.com/en/1.1.x/installation/
 
-
 # File Structure & Setup
 **Each file will contain the following:**
-\-- vestigia
-  |-- main.py
-  |-- database.sql
-  \-- static
-    |-- style.css
-    |-- base.css
-  \-- templates
-    |-- index.html
-    |-- register.html
-    |-- home.html
-    |-- profile.html
-    |-- post.html
-    |-- reply.html
-    |-- layout.html
-
+* \\-- vestigia
+   <br> &emsp; &emsp;|-- main.py
+  * &emsp;\\-- static
+    <br> &emsp;&emsp; &emsp;|-- style.css
+    <br> &emsp;&emsp; &emsp;|-- base.css
+  * &emsp; \\-- templates
+    <br> &emsp;&emsp; &emsp; |-- index.html
+    <br> &emsp;&emsp; &emsp; |-- register.html
+    <br> &emsp;&emsp; &emsp; |-- login.html
+    <br> &emsp;&emsp; &emsp; |-- profile.html
+    <br> &emsp;&emsp; &emsp; |-- layout.html 
+    <br> &emsp;&emsp; &emsp; |-- reply.html 
+    <br> &emsp;&emsp; &emsp; |-- post.html 
+  - 
   - main.py — This will be our main project file, all our Python code will be in this file (Routes, MySQL connection, validation, etc).
   - index.html — home page created with HTML5 and CSS3.
   - register.html — Registration form created with HTML5 and CSS3.
