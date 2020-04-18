@@ -26,9 +26,8 @@
     <br> &emsp;&emsp; &emsp; |-- profile.html
     <br> &emsp;&emsp; &emsp; |-- layout.html 
     <br> &emsp;&emsp; &emsp; |-- reply.html 
-    <br> &emsp;&emsp; &emsp; |-- post.html 
-    
-
+    <br> &emsp;&emsp; &emsp; |-- post.html     
+ -
   - main.py — This will be our main project file, all our Python code will be in this file (Routes, MySQL connection, validation, etc).
   - index.html — home page created with HTML5 and CSS3.
   - register.html — Registration form created with HTML5 and CSS3.
